@@ -1,303 +1,206 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Content Intelligence — CA par page</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#1a1a19;background:#f8f7f4;min-height:100vh}
+    .topnav{background:#fff;border-bottom:0.5px solid #e0dfd8;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+    .topnav-left{display:flex;align-items:center;gap:8px}
+    .logo{width:28px;height:28px;background:#E24B4A;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:700;flex-shrink:0}
+    .nav-title{font-size:15px;font-weight:500}
+    .nav-sub{font-size:12px;color:#6b6a65;margin-left:4px}
+    .topnav-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+    .topnav-right select{font-size:12px;padding:5px 10px;height:30px;border-radius:99px;border:0.5px solid #c0beb5;background:#f1efe8;color:#1a1a19;cursor:pointer}
+    .compare-wrap{display:flex;align-items:center;gap:6px;font-size:12px;color:#6b6a65;padding:0 4px}
+    .compare-wrap input{width:14px;height:14px;cursor:pointer}
+    .sep{width:1px;height:18px;background:#e0dfd8}
+    .content{padding:20px 24px}
+    .section-block{background:#fff;border-radius:12px;border:0.5px solid #e0dfd8;margin-bottom:12px;overflow:hidden}
+    .section-head{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:0.5px solid #e0dfd8}
+    .section-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+    .dot-blue{background:#378ADD}.dot-green{background:#639922}.dot-amber{background:#BA7517}
+    .section-name{font-size:12px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;color:#6b6a65}
+    .kpi-toggles{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+    .ktog{font-size:11px;padding:3px 10px;border-radius:99px;border:0.5px solid #e0dfd8;background:#f1efe8;color:#9c9a92;cursor:pointer;user-select:none}
+    .ktog:hover{border-color:#c0beb5;color:#6b6a65}
+    .ktog.on.blue{border-color:#185fa5;background:#e6f1fb;color:#0c447c}
+    .ktog.on.green{border-color:#3b6d11;background:#eaf3de;color:#27500a}
+    .ktog.on.amber{border-color:#854f0b;background:#faeeda;color:#633806}
+    .kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:1px;background:#e0dfd8}
+    .kcard{background:#fff;padding:14px 16px;display:none}
+    .kcard.visible{display:block}
+    .kcard-label{font-size:11px;color:#9c9a92;margin-bottom:6px;font-weight:500;letter-spacing:.03em}
+    .kcard-val{font-size:22px;font-weight:500;line-height:1}
+    .kcard-cmp{font-size:11px;margin-top:5px;min-height:14px}
+    .up{color:#3b6d11}.dn{color:#a32d2d}
+    .table-block{background:#fff;border-radius:12px;border:0.5px solid #e0dfd8;overflow:hidden}
+    .table-toolbar{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:0.5px solid #e0dfd8;flex-wrap:wrap}
+    .toolbar-label{font-size:12px;font-weight:500;color:#6b6a65}
+    .pill-row{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+    .pill{font-size:12px;padding:4px 12px;border-radius:99px;border:0.5px solid #e0dfd8;background:#f1efe8;color:#6b6a65;cursor:pointer}
+    .pill:hover{border-color:#c0beb5}
+    .pill.active{background:#e6f1fb;color:#0c447c;border-color:#185fa5}
+    .table-wrap{overflow-x:auto}
+    table{width:100%;border-collapse:collapse;font-size:12px}
+    th{text-align:left;font-size:11px;font-weight:500;color:#9c9a92;padding:8px 12px;border-bottom:0.5px solid #e0dfd8;cursor:pointer;white-space:nowrap;background:#f8f7f4;user-select:none}
+    th:hover{color:#6b6a65}
+    td{padding:9px 12px;border-bottom:0.5px solid #e0dfd8;white-space:nowrap}
+    tr:last-child td{border-bottom:none}
+    tr:hover td{background:#f8f7f4}
+    .td-page{color:#185fa5;font-size:12px}
+    .td-ls{color:#9c9a92;font-size:11px;font-family:monospace}
+    .badge{display:inline-block;font-size:10px;padding:2px 8px;border-radius:99px;font-weight:500;margin-left:4px}
+    .bg{background:#eaf3de;color:#27500a}.ba{background:#faeeda;color:#633806}.br{background:#fcebeb;color:#501313}
+    .cmp-inline{font-size:10px;margin-left:4px}
+  </style>
+</head>
+<body>
 
-<style>
-.db{font-family:var(--font-sans);color:var(--color-text-primary);padding:12px 0}
-.top-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
-.top-bar select,.top-bar input{font-size:12px;padding:5px 8px;height:30px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-primary)}
-.sep{width:1px;height:20px;background:var(--color-border-tertiary);margin:0 2px}
-.period-compare{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--color-text-secondary)}
-.period-compare input[type=checkbox]{width:14px;height:14px}
-.section-row{display:flex;align-items:center;gap:10px;margin:16px 0 8px}
-.section-title{font-size:11px;font-weight:500;letter-spacing:.06em;color:var(--color-text-tertiary);text-transform:uppercase}
-.kpi-toggles{display:flex;gap:6px;flex-wrap:wrap}
-.ktog{font-size:11px;padding:3px 10px;border-radius:99px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-secondary);cursor:pointer;user-select:none}
-.ktog.on{border-color:var(--color-border-info);background:var(--color-background-info);color:var(--color-text-info)}
-.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:4px}
-.kpi-grid.calls .ktog.on{border-color:var(--color-border-success);background:var(--color-background-success);color:var(--color-text-success)}
-.kpi-grid.ventes .ktog.on{border-color:var(--color-border-warning);background:var(--color-background-warning);color:var(--color-text-warning)}
-.kcard{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px 12px;display:none}
-.kcard.visible{display:block}
-.kcard-label{font-size:11px;color:var(--color-text-secondary);margin-bottom:3px}
-.kcard-val{font-size:20px;font-weight:500}
-.kcard-cmp{font-size:11px;margin-top:2px}
-.kcard-cmp.up{color:var(--color-text-success)}
-.kcard-cmp.dn{color:var(--color-text-danger)}
-.kcard-cmp.nt{color:var(--color-text-tertiary)}
-hr.div{border:none;border-top:0.5px solid var(--color-border-tertiary);margin:16px 0}
-.pill-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
-.pill{font-size:12px;padding:4px 12px;border-radius:99px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-secondary);cursor:pointer}
-.pill.active{background:var(--color-background-info);color:var(--color-text-info);border-color:var(--color-border-info)}
-table{width:100%;border-collapse:collapse;font-size:12px}
-th{text-align:left;font-size:11px;font-weight:500;color:var(--color-text-tertiary);padding:6px 6px;border-bottom:0.5px solid var(--color-border-tertiary);cursor:pointer;white-space:nowrap}
-td{padding:7px 6px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-primary);white-space:nowrap}
-tr:hover td{background:var(--color-background-secondary)}
-.badge{display:inline-block;font-size:10px;padding:2px 7px;border-radius:99px;font-weight:500}
-.bg{background:var(--color-background-success);color:var(--color-text-success)}
-.ba{background:var(--color-background-warning);color:var(--color-text-warning)}
-.br{background:var(--color-background-danger);color:var(--color-text-danger)}
-.cmp-cell{font-size:10px;color:var(--color-text-tertiary)}
-.cmp-up{color:var(--color-text-success)}
-.cmp-dn{color:var(--color-text-danger)}
-</style>
-
-<div class="db">
-
-<div class="top-bar">
-  <select id="sel-marche" onchange="render()">
-    <option value="all">Tous les marchés</option>
-    <option value="telco" selected>Telco</option>
-    <option value="energie">Energie</option>
-    <option value="assurance">Assurance</option>
-    <option value="finance">Finance</option>
-    <option value="renov">Rénovation énergétique</option>
-  </select>
-  <select id="sel-site" onchange="render()">
-    <option value="all">Tous les sites</option>
-    <option value="prix-elec.com" selected>prix-elec.com</option>
-    <option value="selectra.info">selectra.info</option>
-    <option value="goodassur.com">goodassur.com</option>
-    <option value="echosdunet.net">echosdunet.net</option>
-  </select>
-  <div class="sep"></div>
-  <select id="sel-periode" onchange="render()">
-    <option>7 derniers jours</option>
-    <option selected>30 derniers jours</option>
-    <option>90 derniers jours</option>
-    <option>Année en cours</option>
-  </select>
-  <div class="period-compare">
-    <input type="checkbox" id="compare-toggle" onchange="render()">
-    <label for="compare-toggle">Comparer période précédente</label>
+<div class="topnav">
+  <div class="topnav-left">
+    <div class="logo">S</div>
+    <span class="nav-title">Content Intelligence</span>
+    <span class="nav-sub">CA par page</span>
   </div>
-  <div class="sep"></div>
-  <select id="sel-partner" onchange="render()">
-    <option value="all">Tous partenaires</option>
-    <option value="orange">Orange</option>
-    <option value="free">Free</option>
-    <option value="bouygues">Bouygues</option>
-    <option value="sfr">SFR</option>
-  </select>
-  <select id="sel-ls" onchange="render()">
-    <option value="all">Tous les LS</option>
-    <option value="fr-ti-cs-lafibreorange">fr-ti-cs-lafibreorange</option>
-    <option value="fr-ti-cs-lafibresfr">fr-ti-cs-lafibresfr</option>
-    <option value="fr-ti-cs-telcogeneral">fr-ti-cs-telcogeneral</option>
-  </select>
+  <div class="topnav-right">
+    <select id="sel-marche" onchange="render()">
+      <option value="all">Tous les marchés</option>
+      <option value="telco" selected>Telco</option>
+      <option value="energie">Energie</option>
+      <option value="assurance">Assurance</option>
+      <option value="finance">Finance</option>
+      <option value="renov">Rénovation énergie</option>
+    </select>
+    <select id="sel-site" onchange="render()">
+      <option value="all">Tous les sites</option>
+      <option value="prix-elec.com" selected>prix-elec.com</option>
+      <option value="selectra.info">selectra.info</option>
+      <option value="goodassur.com">goodassur.com</option>
+      <option value="echosdunet.net">echosdunet.net</option>
+    </select>
+    <div class="sep"></div>
+    <select id="sel-periode" onchange="render()">
+      <option>7 derniers jours</option>
+      <option selected>30 derniers jours</option>
+      <option>90 derniers jours</option>
+      <option>Année en cours</option>
+    </select>
+    <div class="compare-wrap">
+      <input type="checkbox" id="compare-toggle" onchange="render()">
+      <label for="compare-toggle">vs période préc.</label>
+    </div>
+    <div class="sep"></div>
+    <select id="sel-partner" onchange="render()">
+      <option value="all">Tous partenaires</option>
+      <option value="orange">Orange</option>
+      <option value="free">Free</option>
+      <option value="bouygues">Bouygues</option>
+      <option value="sfr">SFR</option>
+    </select>
+    <select id="sel-ls" onchange="render()">
+      <option value="all">Tous les LS</option>
+      <option value="fr-ti-cs-lafibreorange">fr-ti-cs-lafibreorange</option>
+      <option value="fr-ti-cs-lafibresfr">fr-ti-cs-lafibresfr</option>
+      <option value="fr-ti-cs-telcogeneral">fr-ti-cs-telcogeneral</option>
+    </select>
+  </div>
 </div>
 
-<div class="section-row">
-  <span class="section-title">SEO</span>
-  <div class="kpi-toggles" id="tog-seo"></div>
-</div>
-<div class="kpi-grid" id="grid-seo"></div>
-
-<div class="section-row">
-  <span class="section-title">Appels</span>
-  <div class="kpi-toggles calls" id="tog-calls"></div>
-</div>
-<div class="kpi-grid calls" id="grid-calls"></div>
-
-<div class="section-row">
-  <span class="section-title">Ventes</span>
-  <div class="kpi-toggles ventes" id="tog-ventes"></div>
-</div>
-<div class="kpi-grid ventes" id="grid-ventes"></div>
-
-<hr class="div">
-
-<div class="pill-row" id="pills"></div>
-
-<div style="overflow-x:auto">
-<table><thead id="thead"></thead><tbody id="tbody"></tbody></table>
-</div>
+<div class="content">
+  <div class="section-block">
+    <div class="section-head">
+      <div class="section-dot dot-blue"></div>
+      <span class="section-name">SEO</span>
+      <div class="kpi-toggles" id="tog-seo"></div>
+    </div>
+    <div class="kpi-grid" id="grid-seo"></div>
+  </div>
+  <div class="section-block">
+    <div class="section-head">
+      <div class="section-dot dot-green"></div>
+      <span class="section-name">Appels</span>
+      <div class="kpi-toggles" id="tog-calls"></div>
+    </div>
+    <div class="kpi-grid" id="grid-calls"></div>
+  </div>
+  <div class="section-block">
+    <div class="section-head">
+      <div class="section-dot dot-amber"></div>
+      <span class="section-name">Ventes</span>
+      <div class="kpi-toggles" id="tog-ventes"></div>
+    </div>
+    <div class="kpi-grid" id="grid-ventes"></div>
+  </div>
+  <div class="table-block">
+    <div class="table-toolbar">
+      <span class="toolbar-label">Détail par page</span>
+      <div class="pill-row" id="pills"></div>
+    </div>
+    <div class="table-wrap">
+      <table><thead id="thead"></thead><tbody id="tbody"></tbody></table>
+    </div>
+  </div>
 </div>
 
 <script>
-const SEO_KPIS = [
-  {id:'vues',label:'Vues',fmt:'n',on:true},
-  {id:'tel',label:'Clics tel',fmt:'n',on:true},
-  {id:'affi',label:'Clics affi',fmt:'n',on:true},
-  {id:'modal',label:'Clics modal',fmt:'n',on:false},
-  {id:'tel_rate',label:'Tel rate',fmt:'pct',on:true},
-  {id:'affi_rate',label:'Affi rate',fmt:'pct',on:false},
-  {id:'modal_rate',label:'Modal rate',fmt:'pct',on:false},
-];
-const CALL_KPIS = [
-  {id:'calls',label:'Total calls',fmt:'n',on:true},
-  {id:'received',label:'Received',fmt:'n',on:true},
-  {id:'missed',label:'Missed',fmt:'n',on:true},
-  {id:'npc',label:'NPC',fmt:'n',on:false},
-  {id:'received_rate',label:'Received rate',fmt:'pct',on:true},
-  {id:'missed_rate',label:'Missed rate',fmt:'pct',on:false},
-];
-const VENTE_KPIS = [
-  {id:'ca',label:'CA total',fmt:'eur',on:true},
-  {id:'contrats',label:'Total contrats',fmt:'n',on:true},
-  {id:'core',label:'Contract Core',fmt:'n',on:true},
-  {id:'add',label:'Contrat Add',fmt:'n',on:false},
-  {id:'lead',label:'Contrat Lead',fmt:'n',on:false},
-  {id:'transfo_core',label:'Transfo Core',fmt:'pct',on:true},
-  {id:'transfo_add',label:'Transfo Add',fmt:'pct',on:false},
-  {id:'transfo_lead',label:'Transfo Lead',fmt:'pct',on:false},
-];
-
-const ROWS = [
-  {page:'/offre-fibre-orange',ls:'fr-ti-cs-lafibreorange',partner:'orange',vues:18400,tel:980,affi:1200,modal:320,calls:712,received:570,missed:100,npc:42,contrats:89,core:54,add:22,lead:13,ca:12400},
-  {page:'/offre-fibre-free',ls:'fr-ti-cs-lafibresfr',partner:'free',vues:14200,tel:620,affi:890,modal:210,calls:480,received:384,missed:67,npc:29,contrats:54,core:32,add:14,lead:8,ca:7800},
-  {page:'/offre-fibre-bouygues',ls:'fr-ti-cs-lafibrebouygues',partner:'bouygues',vues:11800,tel:490,affi:670,modal:180,calls:340,received:272,missed:48,npc:20,contrats:41,core:24,add:10,lead:7,ca:5900},
-  {page:'/comparatif-fibre',ls:'fr-ti-cs-telcogeneral',partner:'all',vues:22100,tel:340,affi:2100,modal:480,calls:210,received:168,missed:29,npc:13,contrats:28,core:16,add:7,lead:5,ca:3800},
-  {page:'/offre-box-sfr',ls:'fr-ti-cs-boxsfr',partner:'sfr',vues:9600,tel:380,affi:520,modal:140,calls:260,received:208,missed:36,npc:16,contrats:35,core:20,add:9,lead:6,ca:4200},
-  {page:'/meilleure-box-internet',ls:'fr-ti-cs-telcogeneral',partner:'all',vues:31400,tel:210,affi:3200,modal:620,calls:140,received:112,missed:19,npc:9,contrats:18,core:10,add:5,lead:3,ca:2400},
-  {page:'/offre-fibre-sfr',ls:'fr-ti-cs-lafibresfr',partner:'sfr',vues:8900,tel:220,affi:410,modal:95,calls:158,received:126,missed:22,npc:10,contrats:22,core:13,add:6,lead:3,ca:2800},
-];
-
-function derived(r){
-  return {...r,
-    tel_rate:r.vues?r.tel/r.vues*100:0,
-    affi_rate:r.vues?r.affi/r.vues*100:0,
-    modal_rate:r.vues?r.modal/r.vues*100:0,
-    received_rate:r.calls?r.received/r.calls*100:0,
-    missed_rate:r.calls?r.missed/r.calls*100:0,
-    transfo_core:r.calls?r.core/r.calls*100:0,
-    transfo_add:r.calls?r.add/r.calls*100:0,
-    transfo_lead:r.calls?r.lead/r.calls*100:0,
-  };
+const SEO_KPIS=[{id:'vues',label:'Vues',fmt:'n',on:true,color:'blue'},{id:'tel',label:'Clics tel',fmt:'n',on:true,color:'blue'},{id:'affi',label:'Clics affi',fmt:'n',on:true,color:'blue'},{id:'modal',label:'Clics modal',fmt:'n',on:false,color:'blue'},{id:'tel_rate',label:'Tel rate',fmt:'pct',on:true,color:'blue'},{id:'affi_rate',label:'Affi rate',fmt:'pct',on:false,color:'blue'},{id:'modal_rate',label:'Modal rate',fmt:'pct',on:false,color:'blue'}];
+const CALL_KPIS=[{id:'calls',label:'Total calls',fmt:'n',on:true,color:'green'},{id:'received',label:'Received',fmt:'n',on:true,color:'green'},{id:'missed',label:'Missed',fmt:'n',on:true,color:'green'},{id:'npc',label:'NPC',fmt:'n',on:false,color:'green'},{id:'received_rate',label:'Received rate',fmt:'pct',on:true,color:'green'},{id:'missed_rate',label:'Missed rate',fmt:'pct',on:false,color:'green'}];
+const VENTE_KPIS=[{id:'ca',label:'CA total',fmt:'eur',on:true,color:'amber'},{id:'contrats',label:'Total contrats',fmt:'n',on:true,color:'amber'},{id:'core',label:'Contract Core',fmt:'n',on:true,color:'amber'},{id:'add',label:'Contrat Add',fmt:'n',on:false,color:'amber'},{id:'lead_c',label:'Contrat Lead',fmt:'n',on:false,color:'amber'},{id:'transfo_core',label:'Transfo Core',fmt:'pct',on:true,color:'amber'},{id:'transfo_add',label:'Transfo Add',fmt:'pct',on:false,color:'amber'},{id:'transfo_lead',label:'Transfo Lead',fmt:'pct',on:false,color:'amber'}];
+const ROWS=[{page:'/offre-fibre-orange',ls:'fr-ti-cs-lafibreorange',partner:'orange',vues:18400,tel:980,affi:1200,modal:320,calls:712,received:570,missed:100,npc:42,contrats:89,core:54,add:22,lead_c:13,ca:12400},{page:'/offre-fibre-free',ls:'fr-ti-cs-lafibresfr',partner:'free',vues:14200,tel:620,affi:890,modal:210,calls:480,received:384,missed:67,npc:29,contrats:54,core:32,add:14,lead_c:8,ca:7800},{page:'/offre-fibre-bouygues',ls:'fr-ti-cs-lafibrebouygues',partner:'bouygues',vues:11800,tel:490,affi:670,modal:180,calls:340,received:272,missed:48,npc:20,contrats:41,core:24,add:10,lead_c:7,ca:5900},{page:'/comparatif-fibre',ls:'fr-ti-cs-telcogeneral',partner:'all',vues:22100,tel:340,affi:2100,modal:480,calls:210,received:168,missed:29,npc:13,contrats:28,core:16,add:7,lead_c:5,ca:3800},{page:'/offre-box-sfr',ls:'fr-ti-cs-boxsfr',partner:'sfr',vues:9600,tel:380,affi:520,modal:140,calls:260,received:208,missed:36,npc:16,contrats:35,core:20,add:9,lead_c:6,ca:4200},{page:'/meilleure-box-internet',ls:'fr-ti-cs-telcogeneral',partner:'all',vues:31400,tel:210,affi:3200,modal:620,calls:140,received:112,missed:19,npc:9,contrats:18,core:10,add:5,lead_c:3,ca:2400},{page:'/offre-fibre-sfr',ls:'fr-ti-cs-lafibresfr',partner:'sfr',vues:8900,tel:220,affi:410,modal:95,calls:158,received:126,missed:22,npc:10,contrats:22,core:13,add:6,lead_c:3,ca:2800}];
+function derived(r){return{...r,tel_rate:r.vues?r.tel/r.vues*100:0,affi_rate:r.vues?r.affi/r.vues*100:0,modal_rate:r.vues?r.modal/r.vues*100:0,received_rate:r.calls?r.received/r.calls*100:0,missed_rate:r.calls?r.missed/r.calls*100:0,transfo_core:r.calls?r.core/r.calls*100:0,transfo_add:r.calls?r.add/r.calls*100:0,transfo_lead:r.calls?r.lead_c/r.calls*100:0};}
+function fmtVal(v,fmt){if(fmt==='pct')return v.toFixed(1)+'%';if(fmt==='eur')return Math.round(v).toLocaleString('fr-FR')+'€';return Math.round(v).toLocaleString('fr-FR');}
+function cmpArrow(v,prev){if(!prev)return'';const d=(v-prev)/prev*100;const s=d>=0?'+':'';const c=d>=0?'up':'dn';return`<span class="${c}">${s}${d.toFixed(0)}%</span>`;}
+const prevMult=0.88;let sortCol=null,sortAsc=false,filterPartner='all';
+function allKpis(){return[...SEO_KPIS,...CALL_KPIS,...VENTE_KPIS];}
+function buildToggles(kpis,togId,gridId){
+  document.getElementById(togId).innerHTML=kpis.map(k=>`<span class="ktog${k.on?' on '+k.color:''}" data-id="${k.id}" data-color="${k.color}" onclick="toggleKpi('${k.id}','${togId}','${k.color}')">${k.label}</span>`).join('');
+  document.getElementById(gridId).innerHTML=kpis.map(k=>`<div class="kcard${k.on?' visible':''}" id="kcard-${k.id}"><div class="kcard-label">${k.label}</div><div class="kcard-val" id="kv-${k.id}">—</div><div class="kcard-cmp" id="kc-${k.id}"></div></div>`).join('');
 }
-
-function fmtVal(v,fmt){
-  if(fmt==='pct') return v.toFixed(1)+'%';
-  if(fmt==='eur') return v.toLocaleString('fr-FR')+'€';
-  return Math.round(v).toLocaleString('fr-FR');
+function toggleKpi(id,togId,color){
+  const kpi=allKpis().find(k=>k.id===id);kpi.on=!kpi.on;
+  const el=document.querySelector(`#${togId} [data-id="${id}"]`);
+  if(el){el.classList.toggle('on',kpi.on);if(kpi.on)el.classList.add(color);else el.classList.remove(color);}
+  const card=document.getElementById('kcard-'+id);if(card)card.classList.toggle('visible',kpi.on);
+  render();
 }
-
-function cmpArrow(v, prev, fmt){
-  if(!prev) return '';
-  const diff = ((v-prev)/prev*100);
-  const sign = diff>=0?'+':'';
-  const cls = diff>=0?'cmp-up':'cmp-dn';
-  return `<span class="${cls}">${sign}${diff.toFixed(0)}%</span>`;
-}
-
-const prevMult = 0.88;
-let sortCol=null, sortAsc=false, filterPartner='all';
-
-function allKpis(){return [...SEO_KPIS,...CALL_KPIS,...VENTE_KPIS];}
-
-function buildToggles(kpis, containerId, gridId){
-  const tog = document.getElementById(containerId);
-  const grid = document.getElementById(gridId);
-  tog.innerHTML = kpis.map(k=>`<span class="ktog${k.on?' on':''}" data-id="${k.id}" onclick="toggleKpi('${k.id}','${containerId}','${gridId}')">${k.label}</span>`).join('');
-  grid.innerHTML = kpis.map(k=>`<div class="kcard${k.on?' visible':''}" id="kcard-${k.id}"><div class="kcard-label">${k.label}</div><div class="kcard-val" id="kv-${k.id}">—</div><div class="kcard-cmp" id="kc-${k.id}"></div></div>`).join('');
-}
-
-function toggleKpi(id, togId, gridId){
-  const kpi = allKpis().find(k=>k.id===id);
-  kpi.on = !kpi.on;
-  document.querySelectorAll(`#${togId} [data-id="${id}"]`).forEach(el=>el.classList.toggle('on',kpi.on));
-  const card = document.getElementById('kcard-'+id);
-  if(card) card.classList.toggle('visible', kpi.on);
-}
-
 function getFiltered(){
-  const p = document.getElementById('sel-partner').value;
-  const ls = document.getElementById('sel-ls').value;
-  return ROWS.filter(r=>{
-    if(p!=='all' && r.partner!==p && r.partner!=='all') return false;
-    if(ls!=='all' && r.ls!==ls) return false;
-    return true;
-  }).map(derived);
+  const p=document.getElementById('sel-partner').value;const ls=document.getElementById('sel-ls').value;
+  return ROWS.filter(r=>{if(p!=='all'&&r.partner!==p&&r.partner!=='all')return false;if(ls!=='all'&&r.ls!==ls)return false;return true;}).map(derived);
 }
-
-function sumField(data, field){
-  return data.reduce((s,r)=>s+(r[field]||0),0);
+function updateKpiCards(data,compare){
+  const t={};['vues','tel','affi','modal','calls','received','missed','npc','contrats','core','add','lead_c','ca'].forEach(f=>{t[f]=data.reduce((s,r)=>s+(r[f]||0),0);});
+  t.tel_rate=t.vues?t.tel/t.vues*100:0;t.affi_rate=t.vues?t.affi/t.vues*100:0;t.modal_rate=t.vues?t.modal/t.vues*100:0;
+  t.received_rate=t.calls?t.received/t.calls*100:0;t.missed_rate=t.calls?t.missed/t.calls*100:0;
+  t.transfo_core=t.calls?t.core/t.calls*100:0;t.transfo_add=t.calls?t.add/t.calls*100:0;t.transfo_lead=t.calls?t.lead_c/t.calls*100:0;
+  allKpis().forEach(k=>{const el=document.getElementById('kv-'+k.id);const ec=document.getElementById('kc-'+k.id);if(!el)return;el.textContent=fmtVal(t[k.id]||0,k.fmt);if(ec)ec.innerHTML=compare?cmpArrow(t[k.id]||0,(t[k.id]||0)*prevMult):'';});
 }
-
-function updateKpiCards(data, compare){
-  const total = {};
-  ['vues','tel','affi','modal','calls','received','missed','npc','contrats','core','add','lead','ca'].forEach(f=>{
-    total[f]=sumField(data,f);
-  });
-  total.tel_rate = total.vues?total.tel/total.vues*100:0;
-  total.affi_rate = total.vues?total.affi/total.vues*100:0;
-  total.modal_rate = total.vues?total.modal/total.vues*100:0;
-  total.received_rate = total.calls?total.received/total.calls*100:0;
-  total.missed_rate = total.calls?total.missed/total.calls*100:0;
-  total.transfo_core = total.calls?total.core/total.calls*100:0;
-  total.transfo_add = total.calls?total.add/total.calls*100:0;
-  total.transfo_lead = total.calls?total.lead/total.calls*100:0;
-
-  allKpis().forEach(k=>{
-    const el = document.getElementById('kv-'+k.id);
-    const ec = document.getElementById('kc-'+k.id);
-    if(!el) return;
-    el.textContent = fmtVal(total[k.id]||0, k.fmt);
-    if(ec) ec.innerHTML = compare ? cmpArrow(total[k.id]||0, (total[k.id]||0)*prevMult, k.fmt) : '';
-  });
-}
-
 function buildPills(){
-  const partners = ['all','orange','free','bouygues','sfr'];
-  const labels = {all:'Tous',orange:'Orange',free:'Free',bouygues:'Bouygues',sfr:'SFR'};
-  document.getElementById('pills').innerHTML = partners.map(p=>
-    `<span class="pill${filterPartner===p?' active':''}" onclick="setPill('${p}')">${labels[p]}</span>`
-  ).join('');
+  const partners=['all','orange','free','bouygues','sfr'];const labels={all:'Tous',orange:'Orange',free:'Free',bouygues:'Bouygues',sfr:'SFR'};
+  document.getElementById('pills').innerHTML=partners.map(p=>`<span class="pill${filterPartner===p?' active':''}" onclick="setPill('${p}')">${labels[p]}</span>`).join('');
 }
-
-function setPill(p){
-  filterPartner = p;
-  document.getElementById('sel-partner').value = p;
-  buildPills();
-  render();
+function setPill(p){filterPartner=p;document.getElementById('sel-partner').value=p;buildPills();render();}
+function buildTable(data,compare,activeKpis){
+  const cols=[{label:'Page',key:'page',fmt:'str'},{label:'Leadsource',key:'ls',fmt:'str'},...activeKpis.map(k=>({label:k.label,key:k.id,fmt:k.fmt}))];
+  document.getElementById('thead').innerHTML='<tr>'+cols.map((c,i)=>`<th onclick="doSort(${i})">${c.label}${sortCol===i?(sortAsc?' ↑':' ↓'):' ↕'}</th>`).join('')+'</tr>';
+  let sorted=[...data];
+  if(sortCol!==null&&sortCol>=2){const key=cols[sortCol].key;sorted.sort((a,b)=>sortAsc?(a[key]>b[key]?1:-1):(a[key]<b[key]?1:-1));}
+  document.getElementById('tbody').innerHTML=sorted.map(r=>'<tr>'+cols.map((c,i)=>{
+    if(c.fmt==='str'){if(i===0)return`<td class="td-page">${r[c.key]}</td>`;return`<td class="td-ls">${r[c.key]}</td>`;}
+    const v=r[c.key]||0;const cmp=compare?`<span class="cmp-inline">${cmpArrow(v,v*prevMult)}</span>`:'';
+    const badge=c.key==='tel_rate'?(v>=4?'<span class="badge bg">Forte</span>':v>=2?'<span class="badge ba">Moy.</span>':'<span class="badge br">Faible</span>'):'';
+    return`<td>${fmtVal(v,c.fmt)}${cmp}${badge}</td>`;
+  }).join('')+'</tr>').join('');
 }
-
-function buildTable(data, compare, activeKpis){
-  const cols = [
-    {label:'Page', key:'page', fmt:'str'},
-    {label:'Leadsource', key:'ls', fmt:'str'},
-    ...activeKpis.map(k=>({label:k.label, key:k.id, fmt:k.fmt}))
-  ];
-  document.getElementById('thead').innerHTML = '<tr>'+cols.map((c,i)=>
-    `<th onclick="doSort(${i})">${c.label}${sortCol===i?(sortAsc?' ↑':' ↓'):''}</th>`
-  ).join('')+'</tr>';
-
-  let sorted = [...data];
-  if(sortCol!==null && sortCol>=2){
-    const key = cols[sortCol].key;
-    sorted.sort((a,b)=>sortAsc?(a[key]>b[key]?1:-1):(a[key]<b[key]?1:-1));
-  }
-
-  document.getElementById('tbody').innerHTML = sorted.map(r=>{
-    const tr = cols.map((c,i)=>{
-      if(c.fmt==='str'){
-        const style = i===0?'color:var(--color-text-info)':'color:var(--color-text-secondary);font-size:11px';
-        return `<td style="${style}">${r[c.key]}</td>`;
-      }
-      const v = r[c.key]||0;
-      const prev = v*prevMult;
-      const cmp = compare ? ` <span class="cmp-cell">${cmpArrow(v,prev,c.fmt)}</span>` : '';
-      const badge = c.key==='tel_rate'?(v>=4?'<span class="badge bg">Forte</span>':v>=2?'<span class="badge ba">Moy.</span>':'<span class="badge br">Faible</span>'):'';
-      return `<td>${fmtVal(v,c.fmt)}${cmp} ${badge}</td>`;
-    }).join('');
-    return `<tr>${tr}</tr>`;
-  }).join('');
-}
-
-function doSort(col){
-  if(sortCol===col) sortAsc=!sortAsc;
-  else{sortCol=col;sortAsc=false;}
-  render();
-}
-
+function doSort(col){if(sortCol===col)sortAsc=!sortAsc;else{sortCol=col;sortAsc=false;}render();}
 function render(){
-  const compare = document.getElementById('compare-toggle').checked;
-  const data = getFiltered();
-  const activeKpis = allKpis().filter(k=>k.on);
-  buildPills();
-  updateKpiCards(data, compare);
-  buildTable(data, compare, activeKpis);
+  const compare=document.getElementById('compare-toggle').checked;const data=getFiltered();const activeKpis=allKpis().filter(k=>k.on);
+  buildPills();updateKpiCards(data,compare);buildTable(data,compare,activeKpis);
 }
-
-buildToggles(SEO_KPIS,'tog-seo','grid-seo');
-buildToggles(CALL_KPIS,'tog-calls','grid-calls');
-buildToggles(VENTE_KPIS,'tog-ventes','grid-ventes');
+buildToggles(SEO_KPIS,'tog-seo','grid-seo');buildToggles(CALL_KPIS,'tog-calls','grid-calls');buildToggles(VENTE_KPIS,'tog-ventes','grid-ventes');
 render();
 </script>
+</body>
+</html>
